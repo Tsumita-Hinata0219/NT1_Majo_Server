@@ -2,7 +2,7 @@
 #include <WinUser.h>
 #include "resource.h"
 
-// 構造体
+// 送受信する座標データ
 struct VEC2
 {
 	int x, y;
@@ -13,6 +13,7 @@ const char* title = "Server";
 HWND hwnd;
 WNDCLASS wndclass;
 RECT wrc;
+VEC2 pos1P, pos2P;
 
 // プロトタイプ宣言
 void MyRegisterClass(HINSTANCE);
@@ -109,7 +110,9 @@ void CreateAndShowWindow(HINSTANCE hInstance, int nCmdShow)
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
 	static HBITMAP hBitMap1P, hBitMap2P; // LoadBitMapの帰り値
-	static HDC mdc1P, mdc2P; // ビトッマプ毎のメモリデバイスコンテキスト
+	static HDC hdc, mdc1P, mdc2P; // ビトッマプ毎のメモリデバイスコンテキスト hdcは何か知らん
+	static PAINTSTRUCT ps; // これは知らん
+	static char str[256]; // これも知らん
 
 	switch (iMsg) {
 
@@ -131,10 +134,34 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		// 論理メモリに世も込んだビットマップを展開
 		SelectObject(mdc2P, hBitMap2P);
 
-	
+		// 座標上情報の初期化
+		pos1P.x = pos1P.y = 0;
+		pos2P.x = pos2P.y = 100;
+
 		break;
+
+		/* ───────── ウィンドウ描画(多分) */
+	case WM_PAINT:
+
+		// 更新領域に描画する為に必要な描画ツール（デバイスコンテキスト）を取得
+		hdc = BeginPaint(hwnd, &ps);
+
+		// 転送元デバイスコンテキストから転送先デバイスコンテキストへ
+		// 長方形カラーデータのビットブロックを転送
+		// サーバ側キャラ描画
+		BitBlt(hdc, pos1P.x, pos1P.y, 32, 32, mdc1P, 0, 0, SRCCOPY);
+		// クライアント側キャラ描画
+		BitBlt(hdc, pos2P.x, pos2P.y, 32, 32, mdc2P, 0, 0, SRCCOPY);
+
+		wsprintf(str, "サーバ側：X:%d Y:%d　　クライアント側：X:%d Y:%d", pos1P.x, pos1P.y, pos2P.x, pos2P.y);
+		SetWindowText(hwnd, str);
+
+		// 更新領域を空にする
+		EndPaint(hwnd, &ps);
+
+		return 0;
 		
-		/* ───────── ウィンドウが破棄 */
+		/* ───────── ウィンドウ破棄 */
 	case WM_DESTROY:
 		// 作ったものはちゃんと破棄する
 		DeleteObject(hBitMap1P);
