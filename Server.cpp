@@ -2,6 +2,12 @@
 #include <WinUser.h>
 #include "resource.h"
 
+// 構造体
+struct VEC2
+{
+	int x, y;
+};
+
 // グローバル変数
 const char* title = "Server";
 HWND hwnd;
@@ -102,11 +108,39 @@ void CreateAndShowWindow(HINSTANCE hInstance, int nCmdShow)
 /// </summary>
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
-	// メッセージが来てたら最優先で処理させる
+	static HBITMAP hBitMap1P, hBitMap2P; // LoadBitMapの帰り値
+	static HDC mdc1P, mdc2P; // ビトッマプ毎のメモリデバイスコンテキスト
+
 	switch (iMsg) {
 
-		// ウィンドウが破棄された
+		/* ───────── ウィンドウ生成 */
+	case WM_CREATE:
+		// リソースからビットマップを読み込む（1P）
+		hBitMap1P = LoadBitmap(
+			((LPCREATESTRUCT)lParam)->hInstance, "majo_blue.bmp");
+		// 論理メモリ作成
+		mdc1P = CreateCompatibleDC(NULL);
+		// 論理メモリに世も込んだビットマップを展開
+		SelectObject(mdc1P, hBitMap1P);
+
+		// リソースからビットマップを読み込む（2P）
+		hBitMap2P = LoadBitmap(
+			((LPCREATESTRUCT)lParam)->hInstance, "majo_blue.bmp");
+		// 論理メモリ作成
+		mdc2P = CreateCompatibleDC(NULL);
+		// 論理メモリに世も込んだビットマップを展開
+		SelectObject(mdc2P, hBitMap2P);
+
+	
+		break;
+		
+		/* ───────── ウィンドウが破棄 */
 	case WM_DESTROY:
+		// 作ったものはちゃんと破棄する
+		DeleteObject(hBitMap1P);
+		DeleteDC(mdc1P);
+		DeleteObject(hBitMap2P);
+		DeleteDC(mdc2P);
 
 		// OSに対して、アプリ終了を伝える
 		PostQuitMessage(0);
