@@ -68,7 +68,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	// winsock終了
 	WSACleanup();
 
-	return msg.wParam;
+	return (int)msg.wParam;
 }
 
 // ウインドウプロシージャ
