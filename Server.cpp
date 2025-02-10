@@ -119,19 +119,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam) {
 			SendMessage(hwnd, WM_CLOSE, NULL, NULL);
 			break;
 		case VK_RIGHT:
-			//☆　→キー押されたらサーバ側キャラのX座標を更新
 			pos1P.x += 5;
 			break;
 		case VK_LEFT:
-			//☆　←キー押されたらサーバ側キャラのX座標を更新
 			pos1P.x -= 5;
 			break;
 		case VK_DOWN:
-			//☆　↓キー押されたらサーバ側キャラのY座標を更新
 			pos1P.y += 5;
 			break;
 		case VK_UP:
-			//☆　↑キー押されたらサーバ側キャラのY座標を更新
 			pos1P.y -= 5;
 			break;
 		}
